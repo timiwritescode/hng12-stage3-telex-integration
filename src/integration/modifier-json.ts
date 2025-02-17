@@ -22,7 +22,7 @@ export const MODIFIER_JSON = {
                 background_color: "#ffffff"
         },
         integration_category: "Project Management",
-        integration_type: "Modifier",
+        integration_type: "modifier",
         is_active: true,
         key_features: [
             "Receive message from telex channels.",
