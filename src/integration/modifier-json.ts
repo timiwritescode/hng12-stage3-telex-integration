@@ -1,6 +1,7 @@
-import dotenv from "dotenv";
+import { config } from "dotenv";
 
-dotenv.config({path: ".env"})
+config({path: ".env"})
+
 
 const target_url = process.env.TARGET_URL;
 const tick_url = process.env.TICK_URL;
@@ -43,9 +44,9 @@ export const MODIFIER_JSON = {
                 type: "text"
             }
         ],
-        target_url: "https://u",
-        tick_url: "the_url",
-        website: "the web"
+        target_url,
+        tick_url,
+        website
     },
 
 }
