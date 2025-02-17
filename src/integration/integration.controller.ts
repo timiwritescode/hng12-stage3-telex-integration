@@ -6,7 +6,7 @@ import { ModifierIntegrationRequestPayload } from './dto/modifier-integration.dt
 @Controller('')
 export class IntegrationController {
     constructor(private integrationService: IntegrationService) {}
-    @Get("integrations/modifier/integration.json")
+    @Get("integration.json")
     getModifierJson(
         @Req()
         req
