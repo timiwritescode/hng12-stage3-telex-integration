@@ -16,9 +16,9 @@ export const MODIFIER_JSON = {
         },
         descriptions: {
                 app_description: "A task message formatter that formats every message that starts with 'TODO' as a task message",
-                app_logo: "",
+                app_logo: "http://",
                 app_name: "Task Watch",
-                app_url: "",
+                app_url: "http://",
                 background_color: "#ffffff"
         },
         integration_category: "Project Management",
