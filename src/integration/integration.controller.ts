@@ -47,8 +47,8 @@ export class IntegrationController {
             }
         
     }
-        };
-    }
+        }
+    
 
 
     @Post("/format-message") 
