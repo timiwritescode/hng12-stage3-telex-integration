@@ -61,7 +61,7 @@ export const MODIFIER_JSON = {
             "updated_at": "2025-02-14"
         },
         "descriptions": {
-            "app_name": "Uptime Monitor",
+            "app_name": "Downtime Monitor",
             "app_description": "Monitors website uptime",
             "app_url": "https://hng12-stage3-telex-integration-production.up.railway.app",
             "app_logo": "https://i.imgur.com/lZqvffp.png",
