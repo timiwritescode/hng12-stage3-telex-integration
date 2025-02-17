@@ -29,7 +29,7 @@ export const MODIFIER_JSON = {
             "Format message based on predefined Logic and template.",
             "Send formatted message back to channel.",
         ],
-        permission: {
+        permissions: {
             // events: [
             //     "Receive message from telex channels.",
             //     "Format message based on predefined Logic and template.",
@@ -43,12 +43,9 @@ export const MODIFIER_JSON = {
                 
         },
         settings: [
-            {
-                default: "TODO",
-                label: "taskMessageMarker",
-                required: true,
-                type: "text"
-            }
+            {"label": "site-1", "type": "text", "required": true, "default": ""},
+            {"label": "site-2", "type": "text", "required": true, "default": ""},
+            {"label": "interval", "type": "text", "required": true, "default": "* * * * *"}
         ],
         target_url,
         tick_url,
