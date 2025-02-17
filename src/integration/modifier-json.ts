@@ -29,12 +29,18 @@ export const MODIFIER_JSON = {
             "Format message based on predefined Logic and template.",
             "Send formatted message back to channel.",
         ],
-        permissions: {
-            events: [
-                "Receive message from telex channels.",
-                "Format message based on predefined Logic and template.",
-                "Send formatted message back to channel.",
-            ]
+        permission: {
+            // events: [
+            //     "Receive message from telex channels.",
+            //     "Format message based on predefined Logic and template.",
+            //     "Send formatted message back to channel.",
+            // ],
+            
+            "monitoring_user": {
+                "always_online": true,
+                "display_name": "Custom Performance Monitor"
+            }
+                
         },
         settings: [
             {
