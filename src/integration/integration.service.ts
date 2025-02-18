@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Message } from './message';
 
 
-
+@Injectable()
 export class IntegrationService {
     private logger = new Logger(IntegrationService.name)
     private readonly telexReturnUrl = "https://ping.telex.im/v1/return"

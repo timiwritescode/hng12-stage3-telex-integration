@@ -26,6 +26,8 @@ setInterval(() => {
 
 @Controller('')
 export class IntegrationController {
+
+    constructor(private integrationService: IntegrationService) {}
     @Get("integration.json")
     getModifierJson(
         @Req()
@@ -37,17 +39,13 @@ export class IntegrationController {
 
 
     @Post("/format-message") 
-    @HttpCode(200)
+    @HttpCode(201)
     formatMessage(
         @Body()
         reqBody: ModifierIntegrationRequestPayload
     ) {
 
-        messageQueue.push(reqBody);
-        return {
-            status: "success",
-            message: reqBody?.message || "Message Received"
-
-        }
+        // messageQueue.push(reqBody);
+        return integrationService.getMessageRequestPayload(reqBody.message);
     }
 }
