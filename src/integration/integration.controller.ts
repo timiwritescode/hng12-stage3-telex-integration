@@ -42,7 +42,7 @@ export class IntegrationController {
 
 
     @Post("/format-message") 
-    @HttpCode(201)
+    @HttpCode(200)
     async formatMessage(
         @Body()
         reqBody: ModifierIntegrationRequestPayload
