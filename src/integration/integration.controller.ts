@@ -10,6 +10,7 @@ const messageQueue: Array<ModifierIntegrationRequestPayload> = [];
 async function processQueue() {
     while (messageQueue.length > 0) {
         const payload = messageQueue.shift();
+        console.log(payload)
         try {
             await integrationService.sendFormattedMessageToChannel(payload.channel_id, payload.message);
         } catch(error) {
