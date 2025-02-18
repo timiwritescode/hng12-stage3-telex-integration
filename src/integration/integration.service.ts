@@ -11,7 +11,8 @@ export class IntegrationService {
 
 
     getMessageRequestPayload(message: string): ModifierIntegrationResponsePayload {
-        
+            
+            this.logger.log("Message received")
             if (message.startsWith("TODO")) {
                 return new ModifierIntegrationResponsePayload(
                     "🎯 New task",
