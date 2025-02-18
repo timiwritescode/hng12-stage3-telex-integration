@@ -39,20 +39,25 @@ export class IntegrationController {
 
 
     @Post("/format-message") 
-    @HttpCode(201)
     formatMessage(
-        @Body()
-        reqBody: ModifierIntegrationRequestPayload
+        // @Body()
+        // reqBody: ModifierIntegrationRequestPayload
     ) {
         // messageQueue.push(reqBody)
 
-        const formattedMessage =  integrationService.getMessageRequestPayload(reqBody.message);
+        // const formattedMessage =  integrationService.getMessageRequestPayload(reqBody.message);
         // console.log(formattedMessage)
+        // return {
+        //     event_name: formattedMessage.event_name,
+        //     message: formattedMessage.message,
+        //     status: formattedMessage.status,
+        //     username: formattedMessage.username
+        // };
         return {
-            event_name: formattedMessage.event_name,
-            message: formattedMessage.message,
-            status: formattedMessage.status,
-            username: formattedMessage.username
-        };
+            "event_name": "message formatted",
+            "message": "new message",
+            "status": "success",
+            "username": "task bot"
+        }
     }
 }
