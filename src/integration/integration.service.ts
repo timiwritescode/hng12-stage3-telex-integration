@@ -21,6 +21,7 @@ export class IntegrationService {
                 "Task Bot"
                 )
             }
+
     
             // else leave it as is
             return new ModifierIntegrationResponsePayload(
@@ -34,6 +35,7 @@ export class IntegrationService {
     }
 
     formatMessage(incomingMessage: string): string {    
+        this.logger.log("formatting started")
         const message = new Message(incomingMessage);
         const task = `◽ New Task: ${message.getTaskFromMessage()} \n`
         const assignedTo = `👨🏻‍💻 Assigned to: ${message.getAssignedToFromMessage()} \n`
@@ -45,6 +47,7 @@ export class IntegrationService {
     
     async sendFormattedMessageToChannel(channel_id: string, message: string) {
         try {
+            console.log(channel_id)
             const channelID = channel_id;
             const url = this.telexReturnUrl + "/" + channelID
             
