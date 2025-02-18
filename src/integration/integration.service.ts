@@ -15,6 +15,7 @@ export class IntegrationService {
             this.logger.log("Message received")
             message = message.replace(/<[^>]*>/g, '').trim()
             if (message.startsWith("TODO")) {
+                
                 return new ModifierIntegrationResponsePayload(
                     "🎯 New task",
                 this.formatMessage(message),
@@ -22,7 +23,7 @@ export class IntegrationService {
                 "Task Bot"
                 )
             }
-
+            console.log("formatting not needed")
     
             // else leave it as is
             return new ModifierIntegrationResponsePayload(
