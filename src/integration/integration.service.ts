@@ -27,7 +27,7 @@ export class IntegrationService {
 
                 // save to db
                 await this.saveMessageToDB(payload);
-                console.log(db)
+            
                 return new ModifierIntegrationResponsePayload(
                     "🎯 New task",
                 formattedMessage,
@@ -109,7 +109,7 @@ export class IntegrationService {
         const assignedTo = `👨🏻‍💻 Assigned to: ${task.assigned_to}\n`;
         const dueBy = `📅 Due By: ${task.due_by}\n`;
 
-        return  description + assignedTo + dueBy + "\n";
+        return  id + description + assignedTo + dueBy + "\n";
     }
 
     async saveMessageToDB(dto: ModifierIntegrationRequestPayload) {
