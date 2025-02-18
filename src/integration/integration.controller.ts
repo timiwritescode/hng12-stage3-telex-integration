@@ -45,10 +45,10 @@ export class IntegrationController {
     @HttpCode(200)
     async formatMessage(
         @Body()
-        reqBody: ModifierIntegrationRequestPayload
+        reqBody
     ) {
         // messageQueue.push(reqBody)
-
+        console.log(reqBody)
         const formattedMessage =  await integrationService.getMessageRequestPayload(reqBody);
         
         return {

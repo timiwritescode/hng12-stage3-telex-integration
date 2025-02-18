@@ -19,7 +19,7 @@ export class IntegrationService {
     async getMessageRequestPayload(payload: ModifierIntegrationRequestPayload): Promise<ModifierIntegrationResponsePayload> {
             
             this.logger.log("Message received")
-            console.log(payload)
+            // console.log(payload)
             const message = this.trimHTMLTagsfromMessage(payload.message)
             if (message.startsWith("TODO")) {
                 const formattedMessage = await this.formatMessage(message);
