@@ -7,8 +7,8 @@ export async function sendFormattedMessageToChannel(
                 payload: ModifierIntegrationResponsePayload) : Promise<void> {
     try {
         const url = telexReturnUrl + "/" + channel_id
-
-        await axios.post(url, 
+        console.log(url)
+        const response = await axios.post(url, 
             payload, {
                 headers: {
                     Accept: "application/json",
@@ -16,6 +16,7 @@ export async function sendFormattedMessageToChannel(
             }
         );
 
+        console.log(response.status)
 
     } catch (error) {
         this.logger.error(error.message)
