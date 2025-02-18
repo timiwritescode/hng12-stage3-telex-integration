@@ -7,11 +7,13 @@ const integrationService = new IntegrationService()
 
 const messageQueue: Array<ModifierIntegrationRequestPayload> = [];
 
-async function processQueue() {
+// save 
+async function saveTaskToDB() {
     while (messageQueue.length > 0) {
         const payload = messageQueue.shift();
         console.log(payload)
         try {
+            integrationService.saveMessageToDB(payload);
             await integrationService.sendFormattedMessageToChannel(payload.channel_id, payload.message);
         } catch(error) {
             console.error("Message queue processing error: " + error.message)
@@ -21,7 +23,7 @@ async function processQueue() {
 
 
 setInterval(() => {
-    processQueue()
+    saveTaskToDB()
 }, 1000)
 
 @Controller('')
@@ -44,7 +46,7 @@ export class IntegrationController {
         @Body()
         reqBody: ModifierIntegrationRequestPayload
     ) {
-        // messageQueue.push(reqBody)
+        messageQueue.push(reqBody)
 
         const formattedMessage =  integrationService.getMessageRequestPayload(reqBody.message);
         console.log(formattedMessage)
@@ -54,11 +56,5 @@ export class IntegrationController {
             status: formattedMessage.status,
             username: formattedMessage.username
         };
-        // return {
-        //     "event_name": "message formatted",
-        //     "message": "new message",
-        //     "status": "success",
-        //     "username": "task bot"
-        // }
     }
 }
