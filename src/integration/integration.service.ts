@@ -21,12 +21,13 @@ export class IntegrationService {
             this.logger.log("Message received")
             // console.log(payload)
             const message = this.trimHTMLTagsfromMessage(payload.message)
+            payload.channel_id = payload.settings.filter(setting => setting.label == "channelID")[0].default;
             if (message.startsWith("TODO")) {
                 const formattedMessage = await this.formatMessage(message);
 
                 // save to db
                 await this.saveMessageToDB(payload);
-
+                console.log(db)
                 return new ModifierIntegrationResponsePayload(
                     "🎯 New task",
                 formattedMessage,
