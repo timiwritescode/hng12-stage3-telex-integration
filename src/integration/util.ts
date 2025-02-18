@@ -1,12 +1,15 @@
 import axios from "axios";
-import { ModifierIntegrationRequestPayload } from "./dto/modifier-integration.dto";
+import { ModifierIntegrationRequestPayload, ModifierIntegrationResponsePayload } from "./dto/modifier-integration.dto";
 
-export async function sendFormattedMessageToChannel(reqPayload: ModifierIntegrationRequestPayload) {
+export async function sendFormattedMessageToChannel(
+                telexReturnUrl: string, 
+                channel_id: string, 
+                payload: ModifierIntegrationResponsePayload) : Promise<void> {
     try {
-        const url = this.telexReturnUrl + "/" + reqPayload.channel_id
-        const resPayload = await this.getMessageRequestPayload(reqPayload)
+        const url = telexReturnUrl + "/" + channel_id
+
         await axios.post(url, 
-            resPayload, {
+            payload, {
                 headers: {
                     Accept: "application/json",
                 },

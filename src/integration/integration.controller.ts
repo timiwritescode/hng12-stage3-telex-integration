@@ -15,7 +15,7 @@ async function saveTaskToDB() {
         // console.log(payload)
         try {
                         
-            await sendFormattedMessageToChannel(payload);
+            // await sendFormattedMessageToChannel(payload);
         } catch(error) {
             console.error("Message queue processing error: " + error.message)
         }

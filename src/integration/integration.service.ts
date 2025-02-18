@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Message } from './message';
 import { TaskModel } from 'src/db/task.model';
 import { db, InMemoryDb } from 'src/db/inMemorydb';
+import { sendFormattedMessageToChannel } from './util';
 
 
 
@@ -36,12 +37,26 @@ export class IntegrationService {
             
             // use operators to display message
             if (this.taskOperators.includes(message)) {
-                const formattedMessage = await this.handleTaskOperation(message, payload.channel_id);
+                
+                
+                // delegate task operation to bot
+                setImmediate(async () => {
+                    const formattedMessage = await this.handleTaskOperation(message, payload.channel_id);
+                    const botMessagePayload = new ModifierIntegrationResponsePayload(
+                        "🎯 Task",
+                        formattedMessage,
+                        "success",
+                        "Task Bot"
+                    )
+                    await sendFormattedMessageToChannel(this.telexReturnUrl, payload.channel_id, botMessagePayload)
+                })
+                
+                // return the original messge back to channel
                 return new ModifierIntegrationResponsePayload(
-                    "🎯 Task",
-                    formattedMessage,
+                    "message-formatted",
+                    message,
                     "success",
-                    "Task Bot"
+                    "sender"
                 )
             }
     
