@@ -47,7 +47,12 @@ export class IntegrationController {
         // messageQueue.push(reqBody)
 
         const formattedMessage =  integrationService.getMessageRequestPayload(reqBody.message);
-        console.log(formattedMessage)
-        return formattedMessage;
+        // console.log(formattedMessage)
+        return {
+            event_name: formattedMessage.event_name,
+            message: formattedMessage.message,
+            status: formattedMessage.status,
+            username: formattedMessage.username
+        };
     }
 }
