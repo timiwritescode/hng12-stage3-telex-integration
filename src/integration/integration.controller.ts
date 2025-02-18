@@ -44,7 +44,7 @@ export class IntegrationController {
         @Body()
         reqBody: ModifierIntegrationRequestPayload
     ) {
-
+        console.log(reqBody.message)
         // messageQueue.push(reqBody);
         return integrationService.getMessageRequestPayload(reqBody.message);
     }
