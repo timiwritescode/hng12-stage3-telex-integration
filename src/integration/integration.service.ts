@@ -41,7 +41,8 @@ export class IntegrationService {
                 
                 // delegate task operation to bot
                 setImmediate(async () => {
-                    const channelID = payload.settings.filter(setting => setting.label = "channelID")[0].default;
+                    const channelID = payload.settings.filter(setting => setting.label == "channelID")[0].default;
+                    console.log("ChannelID: " + channelID)
                     const formattedMessage = await this.handleTaskOperation(message, channelID);
                     const botMessagePayload = new ModifierIntegrationResponsePayload(
                         "🎯 Task",
