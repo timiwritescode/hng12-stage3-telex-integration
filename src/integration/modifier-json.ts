@@ -42,6 +42,13 @@ export const MODIFIER_JSON = {
                 label: "taskMessageMarker",
                 required: true,
                 type: "text"
+            },
+
+            {
+                default: "",
+                label: "channelID",
+                required: true,
+                type: "text"
             }
         ],
         target_url,
