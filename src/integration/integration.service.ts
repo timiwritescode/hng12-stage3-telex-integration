@@ -1,47 +1,63 @@
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { ModifierIntegrationRequestPayload, ModifierIntegrationResponsePayload } from './dto/modifier-integration.dto';
+import axios from 'axios';
+import { Message } from './message';
 
-interface FormatedMessage {
-    task: string,
-    assigned_to: string,
-    due_by: string
-}
 
-@Injectable()
+
 export class IntegrationService {
     private logger = new Logger(IntegrationService.name)
-    handleFormatMessageRequest(dto: ModifierIntegrationRequestPayload): ModifierIntegrationResponsePayload {
-        try {
-            if (dto.message.startsWith("TODO")) {
+    private readonly telexReturnUrl = "https://ping.telex.im/v1/return"
+
+
+    getMessageRequestPayload(message: string): ModifierIntegrationResponsePayload {
+        
+            if (message.startsWith("TODO")) {
                 return new ModifierIntegrationResponsePayload(
-                    "message_formatted",
-                this.formatMessage(dto.message),
+                    "🎯 New task",
+                this.formatMessage(message),
                 "success",
-                "message-formatter-bot"
+                "Task Bot"
                 )
             }
     
             // else leave it as is
             return new ModifierIntegrationResponsePayload(
-                "message_formatted",
-                dto.message,
+                "New Task",
+                message,
                 "success",
-                "message-formatter-bot"
+                "Task Bot"
             )            
-        } catch (error) {
-            this.logger.error(error.message)
-            throw new InternalServerErrorException("An error occured")
-        }
+        
 
     }
 
-    formatMessage(message: string): string {
-        const messageCompartments = message.split("TODO:");
-        // let formattedMessage:FormatedMessage; 
-        const task = "◽New Task: task desc \n"
-        const assignedTo = "👨🏻‍💻Assigned to: @john \n"
-        const dueBy = "📅 Due: 18-02-2025 \n"
+    formatMessage(incomingMessage: string): string {    
+        const message = new Message(incomingMessage);
+        const task = `◽ New Task: ${message.getTaskFromMessage()} \n`
+        const assignedTo = `👨🏻‍💻 Assigned to: ${message.getAssignedToFromMessage()} \n`
+        const dueBy = `📅 Due By: ${message.getDueDateFromMessage()}\n`
 
         return task + assignedTo + dueBy;
+    }
+
+    
+    async sendFormattedMessageToChannel(channel_id: string, message: string) {
+        try {
+            const channelID = channel_id;
+            const url = this.telexReturnUrl + "/" + channelID
+            
+            // send message to channel
+            const response = await axios.post(url, 
+                this.getMessageRequestPayload(message), {
+                    headers: {
+                        Accept: "application/json"
+                    }
+            });
+            
+        } catch (error) {
+            this.logger.error(error.message)
+            throw error
+        }
     }
 }
