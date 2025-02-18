@@ -50,7 +50,7 @@ export class IntegrationService {
                         "success",
                         "Task Bot"
                     )
-                    await sendFormattedMessageToChannel(this.telexReturnUrl, payload.channel_id, botMessagePayload)
+                    await sendFormattedMessageToChannel(this.telexReturnUrl, channelID, botMessagePayload)
                 })
                 
                 // return the original messge back to channel
