@@ -3,7 +3,7 @@ import { ModifierIntegrationRequestPayload, ModifierIntegrationResponsePayload }
 import axios from 'axios';
 import { Message } from './message';
 import { TaskModel } from 'src/db/task.model';
-import { InMemoryDb } from 'src/db/inMemorydb';
+import { db, InMemoryDb } from 'src/db/inMemorydb';
 
 
 
@@ -11,27 +11,39 @@ import { InMemoryDb } from 'src/db/inMemorydb';
 export class IntegrationService {
     private logger = new Logger(IntegrationService.name)
     private readonly telexReturnUrl = "https://ping.telex.im/v1/return";
-    private db: InMemoryDb
-
-    constructor() {
-        this.db = new InMemoryDb();
-    }
+    private taskOperators = ['/tasks', '/task-done']
 
 
-    getMessageRequestPayload(message: string): ModifierIntegrationResponsePayload {
+
+    async getMessageRequestPayload(payload: ModifierIntegrationRequestPayload): Promise<ModifierIntegrationResponsePayload> {
             
             this.logger.log("Message received")
-            message = this.trimHTMLTagsfromMessage(message)
+            
+            const message = this.trimHTMLTagsfromMessage(payload.message)
             if (message.startsWith("TODO")) {
-                
+                const formattedMessage = await this.formatMessage(message);
+
+                // save to db
+                await this.saveMessageToDB(payload);
+
                 return new ModifierIntegrationResponsePayload(
                     "🎯 New task",
-                this.formatMessage(message),
+                formattedMessage,
                 "success",
                 "Task Bot"
                 )
             }
-            console.log("formatting not needed")
+            
+            // use operators to display message
+            if (this.taskOperators.includes(message)) {
+                const formattedMessage = await this.handleTaskOperation(message, payload.channel_id);
+                return new ModifierIntegrationResponsePayload(
+                    "🎯 Task",
+                    formattedMessage,
+                    "success",
+                    "Task Bot"
+                )
+            }
     
             // else leave it as is
             return new ModifierIntegrationResponsePayload(
@@ -43,7 +55,7 @@ export class IntegrationService {
     }
 
 
-    formatMessage(incomingMessage: string): string {    
+    async formatMessage(incomingMessage: string): Promise<string> {    
         this.logger.log("formatting started")
         const message = new Message(incomingMessage);
         const task = `◽ New Task: ${message.getTaskFromMessage()} \n`
@@ -57,24 +69,29 @@ export class IntegrationService {
         return message.replace(/<[^>]*>/g, '').trim();
     }
     
-    async sendFormattedMessageToChannel(channel_id: string, message: string) {
-        try {
-            console.log(channel_id)
-            const channelID = channel_id;
-            const url = this.telexReturnUrl + "/" + channelID
+    
+
+    async handleTaskOperation(operator: string, channel_id: string): Promise<string> {
+        
+        if (operator == '/tasks') {
+            // get all tasks
+            const allTasks = await this.fetchAllTasks(channel_id)
+            let message = "";
+            for (let task of allTasks) {
+                message += this.composeTaskMessage(task);
+            }
             
-            // send message to channel
-            const response = await axios.post(url, 
-                this.getMessageRequestPayload(message), {
-                    headers: {
-                        Accept: "application/json"
-                    }
-            });
-            
-        } catch (error) {
-            this.logger.error(error.message)
-            throw error
+            return message ? message : "No pending task"
         }
+    }
+
+    composeTaskMessage(task: TaskModel): string {
+        const id = `${task.task_ID}\n`;
+        const description =  `◽Task: ${task.task_description}\n`;
+        const assignedTo = `👨🏻‍💻 Assigned to: ${task.assigned_to}\n`;
+        const dueBy = `📅 Due By: ${task.due_by}\n`;
+
+        return  description + assignedTo + dueBy + "\n";
     }
 
     async saveMessageToDB(dto: ModifierIntegrationRequestPayload) {
@@ -84,24 +101,25 @@ export class IntegrationService {
             const messageHelper = new Message(dto.message);
 
             const newTask = new TaskModel();
-            newTask.task_ID = "#" + (this.db.getCount() + 1);
+            newTask.task_ID = "#" + (db.getCount() + 1);
             newTask.due = false;
             newTask.assigned_to = messageHelper.getAssignedToFromMessage();
             newTask.due_by = messageHelper.getDueDateFromMessage();
             newTask.task_description = messageHelper.getTaskFromMessage();
             newTask.channel_id = dto.channel_id;
+ 
+            await db.save(newTask.task_ID, newTask);
 
-            await this.db.save(newTask.task_ID, newTask);
-
-            console.log(await this.db.findAll())
+           
             
         } catch (error) {
+            console.log(error)
             this.logger.error(error.message);    
         }
         
     }
 
-    fetchAllTasks() {
-        
+    async fetchAllTasks(channel_id: string) {
+        return await db.findAll(channel_id)
     }
 }

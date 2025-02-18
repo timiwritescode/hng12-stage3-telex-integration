@@ -9,5 +9,5 @@ curl -X POST "http://localhost:3000/format-message" \
          {"label": "repeatWords", "type": "multi-select", "default": "world, happy", "required": true},
          {"label": "noOfRepetitions", "type": "number", "default": 2, "required": true}
        ],
-       "message": "<p></p><p></p><p>TODO: investigate /format endpoint and revert to@zion odebode</span> @lois /d 2025-02-12,8am</p><p></p>"
+       "message": "/tasks"
      }'

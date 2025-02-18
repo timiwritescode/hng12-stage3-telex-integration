@@ -2,6 +2,7 @@ import { Body, Controller, Get, HttpCode, Post, Req, Res } from '@nestjs/common'
 import { IntegrationService } from './integration.service';
 import { MODIFIER_JSON } from './modifier-json';
 import { ModifierIntegrationRequestPayload } from './dto/modifier-integration.dto';
+import { sendFormattedMessageToChannel } from './util';
 
 const integrationService = new IntegrationService()
 
@@ -11,10 +12,10 @@ const messageQueue: Array<ModifierIntegrationRequestPayload> = [];
 async function saveTaskToDB() {
     while (messageQueue.length > 0) {
         const payload = messageQueue.shift();
-        console.log(payload)
+        // console.log(payload)
         try {
-            integrationService.saveMessageToDB(payload);
-            await integrationService.sendFormattedMessageToChannel(payload.channel_id, payload.message);
+                        
+            await sendFormattedMessageToChannel(payload);
         } catch(error) {
             console.error("Message queue processing error: " + error.message)
         }
@@ -41,15 +42,15 @@ export class IntegrationController {
 
 
     @Post("/format-message") 
-    @HttpCode(200)
-    formatMessage(
+    @HttpCode(201)
+    async formatMessage(
         @Body()
         reqBody: ModifierIntegrationRequestPayload
     ) {
-        messageQueue.push(reqBody)
+        // messageQueue.push(reqBody)
 
-        const formattedMessage =  integrationService.getMessageRequestPayload(reqBody.message);
-        console.log(formattedMessage)
+        const formattedMessage =  await integrationService.getMessageRequestPayload(reqBody);
+        
         return {
             event_name: formattedMessage.event_name,
             message: formattedMessage.message,

@@ -1,7 +1,7 @@
 import { TaskModel } from "./task.model";
 
 export interface DbOperations {
-    findAll(): Promise<TaskModel[]>
+    findAll(channelID: string): Promise<TaskModel[]>
     findOne(key: string): Promise<TaskModel | null>
     save(key: string, task: TaskModel): Promise<void>
     delete(key: string): Promise<void>
@@ -9,15 +9,19 @@ export interface DbOperations {
 
 export class InMemoryDb implements DbOperations{
     private storage: Map<string, TaskModel> 
-    private taskCount = 0
+    private taskCount = 0;
 
 
     constructor() {
-        this.storage = new Map<string, TaskModel>()
+        this.storage = new Map<string, TaskModel>();
+        this.taskCount = 0
     }
 
-    async findAll(): Promise<TaskModel[]> {
-        return Array.from(this.storage.values())
+    async findAll(channelId: string): Promise<TaskModel[]> {
+        const allTasks = Array.from(this.storage.values());
+        const channelTasks = allTasks.filter(task => task.channel_id == channelId)
+
+        return channelTasks;
     }
 
     async findOne(key: string): Promise<TaskModel | null> {
@@ -38,6 +42,26 @@ export class InMemoryDb implements DbOperations{
     
 }
 
+export const db = new InMemoryDb()
 
+export function seedDatabase() {
+    let x = 0;
+    
+    while (x <= 10) {
+        const taskID = "#" + (db.getCount() + 1)
+        const newTask = new TaskModel();
+        newTask.channel_id = "ID"
+        newTask.assigned_to = "ZionOdebode";
+        newTask.completed = false;
+        newTask.due = false;
+        newTask.due_by = "2025-02-24";
+        newTask.task_ID = taskID;
+        newTask.task_description = "Sleep away the day"
 
-// export const inMemoryDB: TaskModel[] = [];
+       db.save(taskID, newTask);
+
+        x++;
+    }
+}
+
+// seedDatabase();
