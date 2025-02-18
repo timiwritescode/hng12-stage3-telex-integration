@@ -45,7 +45,9 @@ export class IntegrationController {
         reqBody: ModifierIntegrationRequestPayload
     ) {
         // messageQueue.push(reqBody)
-        
-        return integrationService.getMessageRequestPayload(reqBody.message);
+
+        const formattedMessage =  integrationService.getMessageRequestPayload(reqBody.message);
+        console.log(formattedMessage)
+        return formattedMessage;
     }
 }
