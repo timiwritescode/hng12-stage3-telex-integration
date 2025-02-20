@@ -1,3 +1,5 @@
+import { TaskModel } from "src/db/task.model";
+
 export class Message {
     private message: string;
 
@@ -29,4 +31,26 @@ export class Message {
         return dueDate;
     }
 
+    static composeTaskDoneMessage(task: TaskModel) {
+        const header = "✅️ Task Done \n"
+        const id = `Task ID: ${task.task_ID}\n`;
+        const description =  `✅Task: ${task.task_description}\n`;
+        const assignedTo = `👨🏻‍💻 Assigned to: ${task.assigned_to}\n`;
+        const dueBy = `📅 Due By: ${task.due_by}\n`;
+
+        return header + id + description + assignedTo + dueBy + "\n";
+    }
+
+    static composeFetchAllTasksMessage(task: TaskModel): string {
+        const id = `Task ID: ${task.task_ID}\n`;
+        const description =  `◽Task: ${task.task_description}\n`;
+        const assignedTo = `👨🏻‍💻 Assigned to: ${task.assigned_to}\n`;
+        const dueBy = `📅 Due By: ${task.due_by}\n`;
+
+        return  id + description + assignedTo + dueBy + "\n";
+    }
+
+    static composeErrorMessage(message: string): string {
+        return `❌ Error: ${message}`
+    }
 }

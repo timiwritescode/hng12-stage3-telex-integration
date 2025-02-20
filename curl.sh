@@ -3,12 +3,12 @@
 curl -X POST "http://localhost:3000/format-message" \
      -H "Content-Type: application/json" \
      -d '{
-       "channel_id": "01951573-182f-7f1a-8fbd-4896defcbdb0",
+       "channel_id": "019500d7-83b4-7b4b-9a50-9800f4454229",
        "settings": [
          {"label": "maxMessageLength", "type": "number", "default": 30, "required": true},
-         {"label": "channelID", "type": "text", "default": "01951573-182f-7f1a-8fbd-4896defcbdb0", "required": true},
+         {"label": "channelID", "type": "text", "default": "019500d7-83b4-7b4b-9a50-9800f4454229", "required": true},
          {"label": "repeatWords", "type": "multi-select", "default": "world, happy", "required": true},
          {"label": "noOfRepetitions", "type": "number", "default": 2, "required": true}
        ],
-       "message": "<h1>/tasks<h1>"
+       "message": "/tasks-done #1"
      }'

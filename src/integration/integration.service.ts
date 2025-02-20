@@ -1,10 +1,12 @@
-import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { ModifierIntegrationRequestPayload, ModifierIntegrationResponsePayload } from './dto/modifier-integration.dto';
 import axios from 'axios';
 import { Message } from './message';
 import { TaskModel } from 'src/db/task.model';
 import { db, InMemoryDb } from 'src/db/inMemorydb';
 import { sendFormattedMessageToChannel } from './util';
+import { TASK_DONE } from './constants/task-operatiors-expression';
+import { TaskService } from './tasks.service';
 
 
 
@@ -12,14 +14,15 @@ import { sendFormattedMessageToChannel } from './util';
 export class IntegrationService {
     private logger = new Logger(IntegrationService.name)
     private readonly telexReturnUrl = "https://ping.telex.im/v1/return";
-    private taskOperators = ['/tasks', '/task-done']
+    private taskOperators = ['/tasks', '/tasks-done']
 
-
+    constructor(
+        private taskService: TaskService
+    ) {}
 
     async getMessageRequestPayload(payload: ModifierIntegrationRequestPayload): Promise<ModifierIntegrationResponsePayload> {
             
             this.logger.log("Message received")
-            // console.log(payload)
             const message = this.trimHTMLTagsfromMessage(payload.message)
             payload.channel_id = payload.settings.filter(setting => setting.label == "channelID")[0].default;
             if (message.startsWith("TODO")) {
@@ -37,13 +40,12 @@ export class IntegrationService {
             }
             
             // use operators to display message
-            if (this.taskOperators.includes(message)) {
+            if (message.includes("/tasks")) {
                 
                 
                 // delegate task operation to bot
                 setImmediate(async () => {
                     const channelID = payload.settings.filter(setting => setting.label == "channelID")[0].default;
-                    console.log("ChannelID: " + channelID)
                     const formattedMessage = await this.handleTaskOperation(message, channelID);
                     const botMessagePayload = new ModifierIntegrationResponsePayload(
                         "🎯 Task",
@@ -90,27 +92,54 @@ export class IntegrationService {
     
 
     async handleTaskOperation(operator: string, channel_id: string): Promise<string> {
-        
-        if (operator == '/tasks') {
-            // get all tasks
-            const allTasks = await this.fetchAllTasks(channel_id)
-            let message = "";
-            for (let task of allTasks) {
-                message += this.composeTaskMessage(task);
+        let message = "";
+        try {
+            
+            if (operator == '/tasks') {
+                // get all tasks
+                const allTasks = await this.fetchAllTasks(channel_id)
+                console.log(allTasks)
+                for (let task of allTasks) {
+                    message += Message.composeFetchAllTasksMessage(task);
+                }
+    
+                
+                message = message ? message : "No pending task"
+                return message
+            }
+
+            if (operator.includes('/tasks-done')) {
+                // expecting a message in the format
+                // /tasks-done task_id
+                if (TASK_DONE.test(operator) == false) {
+                    const errorMessage = "Invalid operator for message"
+                    message = Message.composeErrorMessage(errorMessage)
+                    return message  
+                } 
+                const taskId = '#' + operator.split('#')[1]
+                
+                const task = await this.taskService.markTasksAsDone(taskId, channel_id);
+                message = Message.composeTaskDoneMessage(task)
+                return message;
+                
             }
             
-            return message ? message : "No pending task"
+        } catch (error) {
+        if (error.response) {
+            message = Message.composeErrorMessage(error.message)
+            console.log(message)
+            return message
+            
+            
+        } else {
+            this.logger.error(error.message)
+            message = Message.composeErrorMessage("An error occured within app");
+            return message
         }
+        }
+
     }
 
-    composeTaskMessage(task: TaskModel): string {
-        const id = `${task.task_ID}\n`;
-        const description =  `◽Task: ${task.task_description}\n`;
-        const assignedTo = `👨🏻‍💻 Assigned to: ${task.assigned_to}\n`;
-        const dueBy = `📅 Due By: ${task.due_by}\n`;
-
-        return  id + description + assignedTo + dueBy + "\n";
-    }
 
     async saveMessageToDB(dto: ModifierIntegrationRequestPayload) {
         // save every incoming task into db
@@ -127,9 +156,6 @@ export class IntegrationService {
             newTask.channel_id = dto.channel_id;
  
             await db.save(newTask.task_ID, newTask);
-
-           
-            
         } catch (error) {
             console.log(error)
             this.logger.error(error.message);    

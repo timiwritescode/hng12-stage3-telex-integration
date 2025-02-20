@@ -1,5 +1,6 @@
 import axios from "axios";
 import { ModifierIntegrationRequestPayload, ModifierIntegrationResponsePayload } from "./dto/modifier-integration.dto";
+import { TaskModel } from "src/db/task.model";
 
 export async function sendFormattedMessageToChannel(
                 telexReturnUrl: string, 
@@ -7,7 +8,6 @@ export async function sendFormattedMessageToChannel(
                 payload: ModifierIntegrationResponsePayload) : Promise<void> {
     try {
         const url = telexReturnUrl + "/" + channel_id
-        console.log(payload.message)
         const response = await axios.post(url, 
             payload, {
                 headers: {
@@ -15,7 +15,6 @@ export async function sendFormattedMessageToChannel(
                 },
             }
         );
-
         console.log(response.status)
 
     } catch (error) {

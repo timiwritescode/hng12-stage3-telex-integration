@@ -9,7 +9,7 @@ export class TaskModel {
 
     due: boolean;
 
-    completed: false;
+    completed: boolean;
 
     channel_id: string
 }
