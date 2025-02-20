@@ -6,13 +6,9 @@ import { TaskModel } from "src/db/task.model";
 export class TaskService {
     async markTasksAsDone(taskID: string, channel_id: string): Promise<TaskModel> {
         try {
-            const task = await db.findOne(taskID);
-            if (!task || 
-                task.channel_id != channel_id) {
-                throw new NotFoundException("Task not found")
-            }
+            const task = await db.findOne(taskID, {channel_id, completed: false});
             if (task == null) {
-                throw new NotFoundException("Task not found")
+                throw new NotFoundException("No incomplete tasks with that ID found")
             }
             
             task.completed = true;

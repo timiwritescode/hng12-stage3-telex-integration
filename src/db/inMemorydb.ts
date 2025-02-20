@@ -1,11 +1,13 @@
 import { TaskModel } from "./task.model";
 
 export interface DbOperations {
-    findAll(channelID: string): Promise<TaskModel[]>
+    findAll(where: Partial<TaskModel>): Promise<TaskModel[]>
     findOne(key: string): Promise<TaskModel | null>
     save(key: string, task: TaskModel): Promise<void>
     delete(key: string): Promise<void>
 }
+
+
 
 export class InMemoryDb implements DbOperations{
     private storage: Map<string, TaskModel> 
@@ -17,15 +19,27 @@ export class InMemoryDb implements DbOperations{
         this.taskCount = 0
     }
 
-    async findAll(channelId: string): Promise<TaskModel[]> {
-        const allTasks = Array.from(this.storage.values());
-        const channelTasks = allTasks.filter(task => task.channel_id == channelId)
+    async findAll(where?: Partial<TaskModel>): Promise<TaskModel[]> {
+        let allTasks = Array.from(this.storage.values());
+        if (where) {
+            allTasks = allTasks.filter(task =>
+                Object.entries(where).every(([key, value]) => (task as any)[key] === value)
+            );
+        
 
-        return channelTasks;
+        return allTasks;
     }
+}
 
-    async findOne(key: string): Promise<TaskModel | null> {
-        return this.storage.get(key) ?? null;
+    async findOne(key: string, where?: Partial<TaskModel>): Promise<TaskModel | null> {
+        const task =  this.storage.get(key) ?? null;
+
+        if (task && where) {
+            const matches = Object.entries(where).every(([field, value]) => (task as any)[field] === value);
+            return matches ? task : null;
+        }
+
+        return task;
     }
 
     async save(key: string, task: TaskModel): Promise<void> {

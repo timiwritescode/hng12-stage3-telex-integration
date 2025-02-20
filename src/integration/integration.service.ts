@@ -57,9 +57,10 @@ export class IntegrationService {
                 })
                 
                 // return the original messge back to channel
+                const modifiedMessage = "<b><i>🎯 performed task operation: " + message + "</i></b>"
                 return new ModifierIntegrationResponsePayload(
                     "message-formatted",
-                    message,
+                    modifiedMessage,
                     "success",
                     "sender"
                 )
@@ -67,7 +68,7 @@ export class IntegrationService {
     
             // else leave it as is
             return new ModifierIntegrationResponsePayload(
-                "New Task",
+                "Original Message",
                 message,
                 "success",
                 "Task Bot"
@@ -127,7 +128,6 @@ export class IntegrationService {
         } catch (error) {
         if (error.response) {
             message = Message.composeErrorMessage(error.message)
-            console.log(message)
             return message
             
             
@@ -150,6 +150,7 @@ export class IntegrationService {
             const newTask = new TaskModel();
             newTask.task_ID = "#" + (db.getCount() + 1);
             newTask.due = false;
+            newTask.completed = false;
             newTask.assigned_to = messageHelper.getAssignedToFromMessage();
             newTask.due_by = messageHelper.getDueDateFromMessage();
             newTask.task_description = messageHelper.getTaskFromMessage();
@@ -157,13 +158,14 @@ export class IntegrationService {
  
             await db.save(newTask.task_ID, newTask);
         } catch (error) {
-            console.log(error)
+            this.logger.error(error.message)
             this.logger.error(error.message);    
         }
         
     }
 
     async fetchAllTasks(channel_id: string) {
-        return await db.findAll(channel_id)
+        
+        return await db.findAll({channel_id, completed: false})
     }
 }
