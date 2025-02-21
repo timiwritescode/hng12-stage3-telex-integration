@@ -7,6 +7,7 @@ import { db, InMemoryDb } from 'src/db/inMemorydb';
 import { sendFormattedMessageToChannel } from './util';
 import { TASK_DONE } from './constants/task-operatiors-expression';
 import { TaskService } from './tasks.service';
+import { channel } from 'diagnostics_channel';
 
 
 
@@ -44,8 +45,9 @@ export class IntegrationService {
                 
                 
                 // delegate task operation to bot
+                const channelID = payload.settings.filter(setting => setting.label == "channelID")[0].default;
                 setImmediate(async () => {
-                    const channelID = payload.settings.filter(setting => setting.label == "channelID")[0].default;
+                    
                     const formattedMessage = await this.handleTaskOperation(message, channelID);
                     const botMessagePayload = new ModifierIntegrationResponsePayload(
                         "🎯 Task",
@@ -62,7 +64,7 @@ export class IntegrationService {
                     "message-formatted",
                     modifiedMessage,
                     "success",
-                    "sender"
+                    "sender" 
                 )
             }
     
@@ -98,32 +100,15 @@ export class IntegrationService {
             
             if (operator == '/tasks') {
                 // get all tasks
-                const allTasks = await this.fetchAllTasks(channel_id)
-                console.log(allTasks)
-                for (let task of allTasks) {
-                    message += Message.composeFetchAllTasksMessage(task);
-                }
-    
-                
-                message = message ? message : "No pending task"
-                return message
+                return await this.handleFetchAllTasksOperation(channel_id)
             }
 
             if (operator.includes('/tasks-done')) {
                 // expecting a message in the format
                 // /tasks-done task_id
-                if (TASK_DONE.test(operator) == false) {
-                    const errorMessage = "Invalid operator for message"
-                    message = Message.composeErrorMessage(errorMessage)
-                    return message  
-                } 
-                const taskId = '#' + operator.split('#')[1]
-                
-                const task = await this.taskService.markTasksAsDone(taskId, channel_id);
-                message = Message.composeTaskDoneMessage(task)
-                return message;
-                
+                return await this.handleMarkTaskAsDoneOperation(operator, channel_id)
             }
+
             
         } catch (error) {
         if (error.response) {
@@ -139,6 +124,33 @@ export class IntegrationService {
         }
 
     }
+
+    private async handleFetchAllTasksOperation(channel_id) {
+        const allTasks = await this.fetchAllTasks(channel_id)
+        let message = '';
+                for (let task of allTasks) {
+                    message += Message.composeFetchAllTasksMessage(task);
+                }
+    
+                
+            message = message ? message : "No pending task"
+            return message
+    }
+    private async handleMarkTaskAsDoneOperation(operator: string, channel_id: string): Promise<string> {
+        
+        if (TASK_DONE.test(operator) == false) {
+            const errorMessage = `Invalid operator for marking tasks as done. \n correct format is /tasks-done <task_id>
+                                    \n e.g /tasks-done #123` 
+            const message = Message.composeErrorMessage(errorMessage)
+            return message  
+        } 
+        const taskId = '#' + operator.split('#')[1]
+        
+        const task = await this.taskService.markTasksAsDone(taskId, channel_id);
+        const message = Message.composeTaskDoneMessage(task)
+        return message;
+    }
+
 
 
     async saveMessageToDB(dto: ModifierIntegrationRequestPayload) {
