@@ -50,6 +50,23 @@ export class Message {
         return  id + description + assignedTo + dueBy + "\n";
     }
 
+    static composeFetchAllCompletedTaskMessage(tasks: TaskModel[]): string {
+        if (tasks.length < 1) {
+            return "No completed tasks"
+        }
+        let message = "📝 Completed Tasks \n\n"
+        for (let task of tasks) {
+            const id = `Task ID: ${task.task_ID}\n`;
+            const description =  `✅Task: ${task.task_description}\n`;
+            const assignedTo = `👨🏻‍💻 Assigned to: ${task.assigned_to}\n`;
+            const dueBy = `📅 Due By: ${task.due_by}\n`;
+
+            message += id + description + assignedTo + dueBy + "\n"
+        }
+
+        return message;
+    }
+
     static composeErrorMessage(message: string): string {
         return `❌ Error: ${message}`
     }

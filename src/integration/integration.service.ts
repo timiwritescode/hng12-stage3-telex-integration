@@ -102,13 +102,19 @@ export class IntegrationService {
                 // get all tasks
                 return await this.handleFetchAllTasksOperation(channel_id)
             }
+            
+            if (operator == '/tasks-done') {
+                // get all completed tasks in a channel
+                return await this.handleFetchAllCompletedTasks(channel_id)
+            }
+
 
             if (operator.includes('/tasks-done')) {
                 // expecting a message in the format
-                // /tasks-done task_id
+                // /tasks-done <task_id> to mark a task as completed
                 return await this.handleMarkTaskAsDoneOperation(operator, channel_id)
             }
-
+ 
             
         } catch (error) {
         if (error.response) {
@@ -136,6 +142,12 @@ export class IntegrationService {
             message = message ? message : "No pending task"
             return message
     }
+
+    public async handleFetchAllCompletedTasks(channel_id: string): Promise<string> {
+        const tasks = await db.findAll({channel_id: channel_id, completed: true})
+        return Message.composeFetchAllCompletedTaskMessage(tasks);
+    }
+
     private async handleMarkTaskAsDoneOperation(operator: string, channel_id: string): Promise<string> {
         
         if (TASK_DONE.test(operator) == false) {
