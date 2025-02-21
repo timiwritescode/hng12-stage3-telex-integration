@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { db, InMemoryDb } from "src/db/inMemorydb";
 import { TaskModel } from "src/db/task.model";
-import { TASK_DONE } from "./constants/task-operatiors-expression";
+import { TASK_DELETE, TASK_DONE } from "./constants/task-operatiors-expression";
 import { Message } from "./message";
 
 @Injectable()
@@ -37,13 +37,26 @@ export class TaskService {
         return Message.composeFetchAllCompletedTaskMessage(tasks);
     }
 
-    private handleTak
+    async handleTaskDelete(operator: string, channel_id: string) {
+        if (TASK_DELETE.test(operator) == false) {
+            const errorMessage = `Invalid operator for marking tasks as done. \t\n correct format is /tasks-done <task_id> e.g /tasks-delete #123` 
+            
+            throw new BadRequestException(errorMessage)  
+        }
+        const taskId = '#' + operator.split('#')[1]
+
+        const task = await db.findOne(taskId, {channel_id: channel_id});
+        if (!task) {
+            throw new NotFoundException('⛔ Task not found')
+        }
+        await db.delete(task.task_ID);
+        
+    }
 
     async handleMarkTaskAsDoneOperation(operator: string, channel_id: string): Promise<string> {
         
         if (TASK_DONE.test(operator) == false) {
-            const errorMessage = `Invalid operator for marking tasks as done. \n correct format is /tasks-done <task_id>
-                                    \n e.g /tasks-done #123` 
+            const errorMessage = `Invalid operator for deleting task.\n correct format is /tasks-done <task_id> e.g /tasks-done #123` 
             const message = Message.composeErrorMessage(errorMessage)
             return message  
         } 

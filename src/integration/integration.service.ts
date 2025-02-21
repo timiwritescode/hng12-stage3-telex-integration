@@ -109,7 +109,8 @@ export class IntegrationService {
             }
 
             if (operator.includes('/tasks-delete')) {
-
+                await this.taskService.handleTaskDelete(operator, channel_id);
+                return '🚯 Task deleted'
             }
 
             if (operator.includes('/tasks-done')) {
