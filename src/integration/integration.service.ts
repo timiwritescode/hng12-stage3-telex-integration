@@ -98,6 +98,16 @@ export class IntegrationService {
         let message = "";
         try {
             
+            if (operator == '/tasks-info') {
+                // get documentation
+                return this.taskService.handleFetchBotInfo();
+            }
+
+            if (operator == '/tasks-man') {
+                // get list of commands
+                return this.taskService.handleFetchBotManPage()
+            }
+
             if (operator == '/tasks') {
                 // get all tasks
                 return await this.taskService.handleFetchAllTasksOperation(channel_id)

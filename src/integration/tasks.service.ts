@@ -67,4 +67,43 @@ export class TaskService {
         return message;
     }
 
+
+    handleFetchBotInfo(): string {
+        return `📝TASK WATCH🎯 
+        ABOUT
+        Task Watch is a task management tool for handling tasks creation and assignment, tasks management and reminder, and setting deadlines for tasks in a team on a telex channel.
+        
+        USAGE
+        TODO: <task> @<assignee> /d time
+        e.g TODO: boil water to make eba @someone /d 2025-02-21 18:00
+        returns: 
+        ◽ New Task: boil water to make eba
+        👨🏻‍💻 Assigned to: @someone
+        📅 Due By: 2025-02-21 18:00
+
+        /tasks: To get all incomplete tasks
+        /tasks-done: to get all complete tasks
+        /tasks-due: to get all due tasks`
+    }
+
+    handleFetchBotManPage(): string {
+        return `📝TASK WATCH🎯
+        USAGE
+
+        Commands are defined below as:
+        <command>: <function>
+        
+        DOCS:
+        /tasks-man: to get a list of commands (this command brought you here 🙃)
+        /tasks-info: to get full documentation with example usages
+
+        OPERATIONS:
+        TODO: <task> @assignee /d yyyy-mm-dd 24hr format time:  to set a new task
+        /tasks: TO get all incomplete tasks
+        /tasks-done: to get all complete tasks
+        /tasks-done <id>: to mark a task as done
+        /tasks-due: to get all tasks passed deadline
+        /tasks-delete <id>: to mark task as delete
+        `
+    }
 }
