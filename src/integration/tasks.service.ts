@@ -21,7 +21,7 @@ export class TaskService {
     }
 
     async handleFetchAllTasksOperation(channel_id) {
-        const allTasks = await db.findAll({channel_id})
+        const allTasks = await db.findAll({channel_id, completed: false, due: false})
         let message = '';
                 for (let task of allTasks) {
                     message += Message.composeFetchAllTasksMessage(task);
