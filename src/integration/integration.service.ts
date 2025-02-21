@@ -100,19 +100,22 @@ export class IntegrationService {
             
             if (operator == '/tasks') {
                 // get all tasks
-                return await this.handleFetchAllTasksOperation(channel_id)
+                return await this.taskService.handleFetchAllTasksOperation(channel_id)
             }
             
             if (operator == '/tasks-done') {
                 // get all completed tasks in a channel
-                return await this.handleFetchAllCompletedTasks(channel_id)
+                return await this.taskService.handleFetchAllCompletedTasks(channel_id)
             }
 
+            if (operator.includes('/tasks-delete')) {
+
+            }
 
             if (operator.includes('/tasks-done')) {
                 // expecting a message in the format
                 // /tasks-done <task_id> to mark a task as completed
-                return await this.handleMarkTaskAsDoneOperation(operator, channel_id)
+                return await this.taskService.handleMarkTaskAsDoneOperation(operator, channel_id)
             }
  
             
@@ -131,38 +134,7 @@ export class IntegrationService {
 
     }
 
-    private async handleFetchAllTasksOperation(channel_id) {
-        const allTasks = await this.fetchAllTasks(channel_id)
-        let message = '';
-                for (let task of allTasks) {
-                    message += Message.composeFetchAllTasksMessage(task);
-                }
     
-                
-            message = message ? message : "No pending task"
-            return message
-    }
-
-    public async handleFetchAllCompletedTasks(channel_id: string): Promise<string> {
-        const tasks = await db.findAll({channel_id: channel_id, completed: true})
-        return Message.composeFetchAllCompletedTaskMessage(tasks);
-    }
-
-    private async handleMarkTaskAsDoneOperation(operator: string, channel_id: string): Promise<string> {
-        
-        if (TASK_DONE.test(operator) == false) {
-            const errorMessage = `Invalid operator for marking tasks as done. \n correct format is /tasks-done <task_id>
-                                    \n e.g /tasks-done #123` 
-            const message = Message.composeErrorMessage(errorMessage)
-            return message  
-        } 
-        const taskId = '#' + operator.split('#')[1]
-        
-        const task = await this.taskService.markTasksAsDone(taskId, channel_id);
-        const message = Message.composeTaskDoneMessage(task)
-        return message;
-    }
-
 
 
     async saveMessageToDB(dto: ModifierIntegrationRequestPayload) {

@@ -48,7 +48,9 @@ export class InMemoryDb implements DbOperations{
         this.taskCount += 1;
     }
 
-    async delete(key: string): Promise<void> {}
+    async delete(key: string): Promise<void> {
+        this.storage.delete(key);
+    }
 
     getCount() {
         return this.taskCount;
