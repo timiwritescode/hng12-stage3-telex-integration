@@ -77,6 +77,7 @@ export class IntegrationService {
             setImmediate(async () => {
                 
                 const formattedMessage = await this.handleTaskOperation(message, channel_id);
+                console.log(formattedMessage)
                 await this.sendBotMessageToChannel(formattedMessage, channel_id);
             })
             
@@ -99,7 +100,7 @@ export class IntegrationService {
     }
 
 
-    private async sendBotMessageToChannel(formattedMessage: string, channelID: string, status = 'successful', title = '🎯 Task') {
+    private async sendBotMessageToChannel(formattedMessage: string, channelID: string, status = 'success', title = '🎯 Task') {
         const botMessagePayload = new ModifierIntegrationResponsePayload(
             title,
             formattedMessage,

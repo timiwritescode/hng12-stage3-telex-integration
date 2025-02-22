@@ -76,7 +76,7 @@ export class TaskService {
         Task Watch is a task management tool for handling tasks creation and assignment, tasks management and reminder, and setting deadlines for tasks in a team on a telex channel.
         
         USAGE
-        TODO: <task> @<assignee> /d time
+        TODO: <task> @<assignee> /d YYYY-MM-DD HH:MM
         e.g TODO: boil water to make eba @someone /d 2025-02-21 18:00
         returns: 
         ◽ New Task: boil water to make eba
@@ -84,6 +84,8 @@ export class TaskService {
         📅 Due By: 2025-02-21 18:00
 
         /tasks: To get all incomplete tasks
+        e.g tasks
+        
         /tasks-done: to get all complete tasks
         /tasks-due: to get all due tasks`
     }
