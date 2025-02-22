@@ -1,3 +1,5 @@
+import { getTimeString } from "src/integration/util";
+
 export class TaskModel {
     task_ID: string;
 
@@ -11,5 +13,17 @@ export class TaskModel {
 
     completed: boolean;
 
-    channel_id: string
+    channel_id: string;
+
+    dateTime: Date;
+
+    createdAt: Date;
+
+    getTimeRemaining(): string {
+        return getTimeString(this.dateTime)
+    }
+
+    getDueTime() {
+        return 
+    }
 }

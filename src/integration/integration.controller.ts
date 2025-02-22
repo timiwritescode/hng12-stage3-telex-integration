@@ -21,9 +21,6 @@ export class IntegrationController {
         @Body()
         reqBody: ModifierIntegrationRequestPayload
     ) {
-        // throw new Error("something bad happened")
-        // messageQueue.push(reqBody)
-        console.log(reqBody)
         const formattedMessage =  await this.integrationService.getMessageRequestPayload(reqBody);
         
         return {
