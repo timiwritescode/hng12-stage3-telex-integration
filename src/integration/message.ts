@@ -55,11 +55,11 @@ export class Message {
     }
 
     static composeTaskCreatedMessage(task: TaskModel): string {
-        const header = "🎯 New Task \n"
-        const id = `Task ID: ${task.task_ID}\n`;
-        const description =  `📋Task: ${task.task_description}\n`;
-        const assignedTo = `👨🏻‍💻 Assigned to: ${task.assigned_to}\n`;
-        const dueBy = `📅 Due By: ${formatDateTime(task.dateTime)}\n`;
+        const header = "🎯 <h1>New Task</h1> \n"
+        const id = `<b>Task ID:</b> ${task.task_ID}\n`;
+        const description =  `<b>📋Task:</b> ${task.task_description}\n`;
+        const assignedTo = `<b>👨🏻‍💻 Assigned to:</b> ${task.assigned_to}\n`;
+        const dueBy = `<b>📅 Due By:</b> ${formatDateTime(task.dateTime)}\n`;
 
         return header + id + description + assignedTo + dueBy
     }
