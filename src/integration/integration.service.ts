@@ -33,8 +33,8 @@ export class IntegrationService {
              } catch(error) {
                 if (error.response) {
                     
-                    const message = Message.composeErrorMessage(error.message)
-                    await this.sendBotMessageToChannel(message, channel_id)
+                    const errorMessage = Message.composeErrorMessage(error.message)
+                    await this.sendBotMessageToChannel(errorMessage, channel_id)
                     const modifiedMessage = "<b><i>🎯 performed task operation: " + message;
                     return new ModifierIntegrationResponsePayload(
                         "message-formated",
