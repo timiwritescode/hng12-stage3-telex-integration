@@ -61,7 +61,7 @@ export class Message {
         const id = `Task ID: ${task.task_ID}\n`;
         const description =  `✅Task: ${task.task_description}\n`;
         const assignedTo = `👨🏻‍💻 Assigned to: ${task.assigned_to}\n`;
-        const dueBy = `📅 Due By: ${task.due_by}\n`;
+        const dueBy = `📅 Due By: ${formatDateTime(task.dateTime)}\n`;
 
         return header + id + description + assignedTo + dueBy + "\n";
     }
@@ -70,7 +70,7 @@ export class Message {
         const id = `Task ID: ${task.task_ID}\n`;
         const description =  `◽Task: ${task.task_description}\n`;
         const assignedTo = `👨🏻‍💻 Assigned to: ${task.assigned_to}\n`;
-        let dueBy = task.getTimeRemaining() ? 
+        let dueBy = !task.getTimeRemaining() ? 
                         `📅 Due By: ${task.due_by} (${task.getTimeRemaining()}) \n` :
                         `📅 Due By: ${formatDateTime(task.dateTime)} \n`;
         
@@ -86,7 +86,7 @@ export class Message {
             const id = `Task ID: ${task.task_ID}\n`;
             const description =  `✅Task: ${task.task_description}\n`;
             const assignedTo = `👨🏻‍💻 Assigned to: ${task.assigned_to}\n`;
-            const dueBy = `📅 Due By: ${task.due_by}\n`;
+            const dueBy = `📅 Due By: ${formatDateTime(task.dateTime)}\n`;
 
             message += id + description + assignedTo + dueBy + "\n"
         }
@@ -99,7 +99,7 @@ export class Message {
         const id = `Task ID: ${task.task_ID}\n`;
         const description =  `📛Task: ${task.task_description}\n`;
         const assignedTo = `👨🏻‍💻 Assigned to: ${task.assigned_to}\n`;
-        const dueBy = `📅 Due By: ${task.due_by}\n`;
+        const dueBy = `📅 Due By: ${formatDateTime(task.dateTime)}\n`;
 
         return header + id + description + assignedTo + dueBy + "\n";
     }
