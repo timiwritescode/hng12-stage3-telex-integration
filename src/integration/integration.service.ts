@@ -96,12 +96,12 @@ export class IntegrationService {
         return task + assignedTo + dueBy;
     }
 
+
     private trimHTMLTagsfromMessage(message: string) {
         return message.replace(/<[^>]*>/g, '').trim();
     }
     
     
-
     async handleTaskOperation(operator: string, channel_id: string): Promise<string> {
         let message = "";
         try {
