@@ -21,8 +21,8 @@ export class ModifierIntegrationResponsePayload {
 }
 
 export class ModifierIntegrationRequestPayload {
-    @IsNotEmpty()
-    channel_id: string;
+    // @IsNotEmpty()
+    // channel_id: string;
 
     @IsNotEmpty()
     @IsArray()

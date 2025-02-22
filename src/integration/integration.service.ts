@@ -21,20 +21,20 @@ export class IntegrationService {
 
     async getMessageRequestPayload(payload: ModifierIntegrationRequestPayload): Promise<ModifierIntegrationResponsePayload> {
         const message = this.trimHTMLTagsfromMessage(payload.message)
-        payload.channel_id = payload.settings.filter(setting => setting.label == "channelID")[0].default;
+        const channel_id = payload.settings.filter(setting => setting.label == "channelID")[0].default;
         
         if (message.startsWith("TODO")) {
             
              // save to db
              try {
                 this.validateTODOMessage(message)
-                await this.saveTaskToDB(payload);
+                await this.saveTaskToDB(payload, channel_id);
                 
              } catch(error) {
                 if (error.response) {
                     
                     const message = Message.composeErrorMessage(error.message)
-                    await this.sendBotMessageToChannel(message, payload.channel_id)
+                    await this.sendBotMessageToChannel(message, channel_id)
                     const modifiedMessage = "<b><i>🎯 performed task operation: " + message;
                     return new ModifierIntegrationResponsePayload(
                         "message-formated",
@@ -209,7 +209,7 @@ export class IntegrationService {
     }
     
 
-    async saveTaskToDB(dto: ModifierIntegrationRequestPayload) {
+    async saveTaskToDB(dto: ModifierIntegrationRequestPayload, channel_id: string) {
         // save every incoming task into db
         try {
             
@@ -226,7 +226,7 @@ export class IntegrationService {
             newTask.dateTime = time;
             newTask.createdAt = new Date();
             newTask.task_description = messageHelper.getTaskFromMessage();
-            newTask.channel_id = dto.channel_id;
+            newTask.channel_id = channel_id;
  
             await db.save(newTask.task_ID, newTask);
             this.scheduleTaskDueReminder(newTask)
