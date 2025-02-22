@@ -77,16 +77,38 @@ export class TaskService {
         
         USAGE
         TODO: <task> @<assignee> /d YYYY-MM-DD HH:MM
-        e.g TODO: boil water to make eba @someone /d 2025-02-21 18:00
-        returns: 
-        ◽ New Task: boil water to make eba
-        👨🏻‍💻 Assigned to: @someone
-        📅 Due By: 2025-02-21 18:00
+        e.g TODO: warm eba @zxenon /d 2025-12-25 08:00
+        modifies message to: 
+            🎯 New Task
+            
+            Task ID: #1
+            📋Task:  warm eba 
+            👨🏻‍💻 Assigned to: @zxenon
+            📅 Due By: Saturday, December 2025, 08:00
+
 
         /tasks: To get all incomplete tasks
-        e.g tasks
+        e.g /tasks returns a list of all incomplete tasks in channel
+            Task ID: #1
+            ◽Task:  warm eba 
+            👨🏻‍💻 Assigned to: @zxenon
+            📅 Due By: Saturday, December 2025, 08:00 
+
+            Task ID: #2
+            ◽Task:  warm amala 
+            👨🏻‍💻 Assigned to: @someone
+            📅 Due By: Monday, February 2025, 08:00 
+
 
         /tasks-done: to get all complete tasks
+        e.g /tasks-done returns
+            📝 Completed Tasks 
+
+            Task ID: #1
+            ✅Task:  warm eba 
+            👨🏻‍💻 Assigned to: @zxenon
+            📅 Due By: Saturday, December 2025, 08:00
+
         /tasks-due: to get all due tasks`
     }
 
@@ -106,7 +128,7 @@ export class TaskService {
         /tasks: TO get all incomplete tasks
         /tasks-done: to get all complete tasks
         /tasks-done <id>: to mark a task as done
-        /tasks-due: to get all tasks passed deadline
+        /tasks-due: to get all the tasks that are passed deadline
         /tasks-delete <id>: to mark task as delete
         `
     }

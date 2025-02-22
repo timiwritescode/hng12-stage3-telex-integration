@@ -40,5 +40,5 @@ curl -X POST "http://localhost:3000/format-message" \
          {"label": "repeatWords", "type": "multi-select", "default": "world, happy", "required": true},
          {"label": "noOfRepetitions", "type": "number", "default": "2", "required": true}
        ],
-       "message": "/tasks-done 3"
+       "message": "/tasks-info"
      }'
