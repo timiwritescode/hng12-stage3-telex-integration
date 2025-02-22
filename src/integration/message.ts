@@ -1,6 +1,5 @@
 import { TaskModel } from "src/db/task-model";
 import { formatDateTime } from "./util";
-import { BadRequestException } from "@nestjs/common";
 
 interface DateTimeField {
     date: string;
@@ -53,6 +52,16 @@ export class Message {
         // console.log(time)
         return {date, time}
 
+    }
+
+    static composeTaskCreatedMessage(task: TaskModel): string {
+        const header = "🎯 New Task \n"
+        const id = `Task ID: ${task.task_ID}\n`;
+        const description =  `📋Task: ${task.task_description}\n`;
+        const assignedTo = `👨🏻‍💻 Assigned to: ${task.assigned_to}\n`;
+        const dueBy = `📅 Due By: ${formatDateTime(task.dateTime)}\n`;
+
+        return header + id + description + assignedTo + dueBy
     }
 
 

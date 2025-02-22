@@ -28,8 +28,14 @@ export class IntegrationService {
              // save to db
              try {
                 this.validateTODOMessage(message)
-                await this.saveTaskToDB(payload, channel_id);
-                
+                const savedTask = await this.saveTaskToDB(payload, channel_id);
+                const formattedMessage = Message.composeTaskCreatedMessage(savedTask);
+                return new ModifierIntegrationResponsePayload(
+                    "🎯 New task",
+                    formattedMessage,
+                    "success",
+                    "Task Bot"
+                )
              } catch(error) {
                 if (error.response) {
                     
@@ -60,13 +66,7 @@ export class IntegrationService {
              }
             
             
-            const formattedMessage = this.formatMessage(message);
-            return new ModifierIntegrationResponsePayload(
-                "🎯 New task",
-            formattedMessage,
-            "success",
-            "Task Bot"
-            )
+            
         }
         
         // use operators to display message
@@ -107,16 +107,6 @@ export class IntegrationService {
             "Task Bot"
         );
         await sendFormattedMessageToChannel(this.telexReturnUrl, channelID, botMessagePayload);
-    }
-
-    formatMessage(incomingMessage: string): string {    
-        this.logger.log("formatting started")
-        const message = new Message(incomingMessage);
-        const task = `◽ New Task: ${message.getTaskFromMessage()} \n`
-        const assignedTo = `👨🏻‍💻 Assigned to: ${message.getAssignedToFromMessage()} \n`
-        const dueBy = `📅 Due By: ${message.getDueDateFromMessage()}\n`
-        
-        return task + assignedTo + dueBy;
     }
 
 
@@ -234,6 +224,7 @@ export class IntegrationService {
  
             await db.save(newTask.task_ID, newTask);
             this.scheduleTaskDueReminder(newTask)
+            return newTask;
         } catch (error) {
             throw error    
         }
