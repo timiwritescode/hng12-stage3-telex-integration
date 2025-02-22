@@ -59,8 +59,8 @@ export class TaskService {
         
         if (TASK_DONE.test(operator) == false) {
             const errorMessage = `Invalid operator for deleting task.\n correct format is /tasks-done <task_id> e.g /tasks-done #123` 
-            const message = Message.composeErrorMessage(errorMessage)
-            return message  
+            
+            throw new BadRequestException(errorMessage)  
         } 
         const taskId = '#' + operator.split('#')[1]
         
@@ -85,7 +85,7 @@ export class TaskService {
 
         /tasks: To get all incomplete tasks
         e.g tasks
-        
+
         /tasks-done: to get all complete tasks
         /tasks-due: to get all due tasks`
     }

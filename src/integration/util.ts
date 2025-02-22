@@ -17,7 +17,7 @@ export async function sendFormattedMessageToChannel(
                     "Accept": "application/json"
                 }});
             
-        console.log(response.data)
+        
 
     } catch (error) {
         console.error(error.message)

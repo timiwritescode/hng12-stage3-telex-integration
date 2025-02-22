@@ -42,7 +42,6 @@ export class IntegrationService {
                     const errorMessage = Message.composeErrorMessage(error.message)
                     setImmediate(async () => {
                 
-                        const formattedMessage = await this.handleTaskOperation(message, channel_id);
                         await this.sendBotMessageToChannel(errorMessage, channel_id, "error")
                     })
                     
@@ -65,20 +64,17 @@ export class IntegrationService {
                 )
              }
             
-            
-            
         }
         
         // use operators to display message
         if (message.includes("/tasks")) {
             
-            
             // delegate task operation to bot
             setImmediate(async () => {
                 
                 const formattedMessage = await this.handleTaskOperation(message, channel_id);
-                console.log(formattedMessage)
-                await this.sendBotMessageToChannel(formattedMessage, channel_id);
+                
+                await this.sendBotMessageToChannel(formattedMessage.message, channel_id, formattedMessage.status);
             })
             
             // return the original messge back to channel
@@ -101,6 +97,7 @@ export class IntegrationService {
 
 
     private async sendBotMessageToChannel(formattedMessage: string, channelID: string, status = 'success', title = '🎯 Task') {
+        
         const botMessagePayload = new ModifierIntegrationResponsePayload(
             title,
             formattedMessage,
@@ -116,52 +113,52 @@ export class IntegrationService {
     }
     
     
-    async handleTaskOperation(operator: string, channel_id: string): Promise<string> {
+    async handleTaskOperation(operator: string, channel_id: string): Promise<{message: string, status: string}> {
         let message = "";
         try {
             
             if (operator == '/tasks-info') {
                 // get documentation
-                return this.taskService.handleFetchBotInfo();
+                return {message: this.taskService.handleFetchBotInfo(), status: "success"};
             }
 
             if (operator == '/tasks-man') {
                 // get list of commands
-                return this.taskService.handleFetchBotManPage()
+                return {message: this.taskService.handleFetchBotManPage(), status: "success"}
             }
 
             if (operator == '/tasks') {
                 // get all tasks
-                return await this.taskService.handleFetchAllTasksOperation(channel_id)
+                return {message: await this.taskService.handleFetchAllTasksOperation(channel_id), status: "success"}
             }
             
             if (operator == '/tasks-done') {
                 // get all completed tasks in a channel
-                return await this.taskService.handleFetchAllCompletedTasks(channel_id)
+                return {message: await this.taskService.handleFetchAllCompletedTasks(channel_id), status: "success"}
             }
 
             if (operator.includes('/tasks-delete')) {
                 await this.taskService.handleTaskDelete(operator, channel_id);
-                return '🚯 Task deleted'
+                return {message: '🚯 Task deleted', status: "success"}
             }
 
             if (operator.includes('/tasks-done')) {
                 // expecting a message in the format
                 // /tasks-done <task_id> to mark a task as completed
-                return await this.taskService.handleMarkTaskAsDoneOperation(operator, channel_id)
+                return {message: await this.taskService.handleMarkTaskAsDoneOperation(operator, channel_id), status: 'success'}
             }
  
             
         } catch (error) {
         if (error.response) {
             message = Message.composeErrorMessage(error.message)
-            return message
+            return {message, status: "error"}
             
             
         } else {
             this.logger.error(error.message)
             message = Message.composeErrorMessage("An error occured within app");
-            return message
+            return {message, status: "error"}
         }
         }
 
@@ -249,7 +246,9 @@ export class IntegrationService {
                 await this.sendBotMessageToChannel(
                     message,
                     task.channel_id,
-                    title
+                    "error",
+                    title,
+                
                 )
             }, delay)
         }

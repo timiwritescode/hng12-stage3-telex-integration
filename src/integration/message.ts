@@ -45,11 +45,11 @@ export class Message {
         
         const match = dateField.match(/^(\d{4}-\d{2}-\d{2})/);
         const date = match ? match[1] : null;
-        // console.log(date)
+        
         const timeMatch = dateField.match(/\d{2}:\d{2}$/);
-        // console.log(timeMatch)
+        
         const time = timeMatch && date? new Date(`${date}T${timeMatch[0]}:00Z`) : null
-        // console.log(time)
+        
         return {date, time}
 
     }
