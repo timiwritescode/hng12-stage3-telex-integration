@@ -23,7 +23,7 @@ export class IntegrationService {
         const message = this.trimHTMLTagsfromMessage(payload.message)
         const channel_id = payload.settings.filter(setting => setting.label == "channelID")[0].default;
         
-        if (message.startsWith("TODO")) {
+        if (message.startsWith("TODO:")) {
             
              // save to db
              try {
