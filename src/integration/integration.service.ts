@@ -20,63 +20,68 @@ export class IntegrationService {
     
 
     async getMessageRequestPayload(payload: ModifierIntegrationRequestPayload): Promise<ModifierIntegrationResponsePayload> {
-            try {
-                const message = this.trimHTMLTagsfromMessage(payload.message)
-                payload.channel_id = payload.settings.filter(setting => setting.label == "channelID")[0].default;
-                if (message.startsWith("TODO")) {
-                    const formattedMessage = await this.formatMessage(message);
-    
-                    // save to db
-                    await this.saveMessageToDB(payload);
+        const message = this.trimHTMLTagsfromMessage(payload.message)
+        payload.channel_id = payload.settings.filter(setting => setting.label == "channelID")[0].default;
+        if (message.startsWith("TODO")) {
+            const formattedMessage = await this.formatMessage(message);
+             // save to db
+             try {
+                await this.saveTaskToDB(payload);
+             } catch(error) {
+                this.logger.error(error.message);
+                const modifiedMessage = "<b><i>❌ task bot internal error for operation: " + message + "</i></b>"
+                return new ModifierIntegrationResponsePayload(
+                    "message-formatted",
+                    modifiedMessage,
+                    "success",
+                    "sender" 
+                )
+             }
+            
+        
+            return new ModifierIntegrationResponsePayload(
+                "🎯 New task",
+            formattedMessage,
+            "success",
+            "Task Bot"
+            )
+        }
+        
+        // use operators to display message
+        if (message.includes("/tasks")) {
+            
+            
+            // delegate task operation to bot
+            const channelID = payload.settings.filter(setting => setting.label == "channelID")[0].default;
+            setImmediate(async () => {
                 
-                    return new ModifierIntegrationResponsePayload(
-                        "🎯 New task",
+                const formattedMessage = await this.handleTaskOperation(message, channelID);
+                const botMessagePayload = new ModifierIntegrationResponsePayload(
+                    "🎯 Task",
                     formattedMessage,
                     "success",
                     "Task Bot"
-                    )
-                }
-                
-                // use operators to display message
-                if (message.includes("/tasks")) {
-                    
-                    
-                    // delegate task operation to bot
-                    const channelID = payload.settings.filter(setting => setting.label == "channelID")[0].default;
-                    setImmediate(async () => {
-                        
-                        const formattedMessage = await this.handleTaskOperation(message, channelID);
-                        const botMessagePayload = new ModifierIntegrationResponsePayload(
-                            "🎯 Task",
-                            formattedMessage,
-                            "success",
-                            "Task Bot"
-                        )
-                        await sendFormattedMessageToChannel(this.telexReturnUrl, channelID, botMessagePayload)
-                    })
-                    
-                    // return the original messge back to channel
-                    const modifiedMessage = "<b><i>🎯 performed task operation: " + message + "</i></b>"
-                    return new ModifierIntegrationResponsePayload(
-                        "message-formatted",
-                        modifiedMessage,
-                        "success",
-                        "sender" 
-                    )
-                }
-        
-                // else leave it as is
-                return new ModifierIntegrationResponsePayload(
-                    "Original Message",
-                    message,
-                    "success",
-                    "Task Bot"
-                )            
-            } catch (error) {
-                if (error.response) throw error;
-                this.logger.error(error.message);
-                throw new InternalServerErrorException('An error occured with bot')
-            }
+                )
+                await sendFormattedMessageToChannel(this.telexReturnUrl, channelID, botMessagePayload)
+            })
+            
+            // return the original messge back to channel
+            const modifiedMessage = "<b><i>🎯 performed task operation: " + message + "</i></b>"
+            return new ModifierIntegrationResponsePayload(
+                "message-formatted",
+                modifiedMessage,
+                "success",
+                "sender" 
+            )
+        }
+             // else leave it as is
+        return new ModifierIntegrationResponsePayload(
+            "Original Message",
+            message,
+            "success",
+            "Task Bot"
+        )            
+            
 
     }
 
@@ -151,7 +156,7 @@ export class IntegrationService {
     
 
 
-    async saveMessageToDB(dto: ModifierIntegrationRequestPayload) {
+    async saveTaskToDB(dto: ModifierIntegrationRequestPayload) {
         // save every incoming task into db
         try {
             dto.message = this.trimHTMLTagsfromMessage(dto.message);
@@ -168,14 +173,8 @@ export class IntegrationService {
  
             await db.save(newTask.task_ID, newTask);
         } catch (error) {
-            this.logger.error(error.message)
-            this.logger.error(error.message);    
+            throw error    
         }
         
-    }
-
-    async fetchAllTasks(channel_id: string) {
-        
-        return await db.findAll({channel_id, completed: false})
     }
 }
