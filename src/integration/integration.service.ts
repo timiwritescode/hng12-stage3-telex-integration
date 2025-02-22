@@ -95,9 +95,9 @@ export class IntegrationService {
     }
 
 
-    private async sendBotMessageToChannel(formattedMessage: string, channelID: string) {
+    private async sendBotMessageToChannel(formattedMessage: string, channelID: string, title = '🎯 Task') {
         const botMessagePayload = new ModifierIntegrationResponsePayload(
-            "🎯 Task",
+            title,
             formattedMessage,
             "success",
             "Task Bot"
@@ -209,7 +209,6 @@ export class IntegrationService {
     }
     
 
-
     async saveTaskToDB(dto: ModifierIntegrationRequestPayload) {
         // save every incoming task into db
         try {
@@ -230,9 +229,26 @@ export class IntegrationService {
             newTask.channel_id = dto.channel_id;
  
             await db.save(newTask.task_ID, newTask);
+            this.scheduleTaskDueReminder(newTask)
         } catch (error) {
             throw error    
         }
         
+    }
+
+    private scheduleTaskDueReminder(task: TaskModel): void {
+        const now = new Date();
+        const delay = task.dateTime.getTime() - now.getTime();
+
+        setTimeout(async () => {
+            console.log("Executing task due reminder")
+            const title = "⏰ Task Due 🔴"
+            const message = Message.composeTaskDueMessage(task)
+            await this.sendBotMessageToChannel(
+                message,
+                task.channel_id,
+                title
+            )
+        }, delay)
     }
 }

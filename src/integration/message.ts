@@ -17,6 +17,9 @@ export class Message {
 
     getTaskFromMessage(): string {
         let task = this.message.split("TODO:")[1].split("@")[0];
+        if (task.includes('/')) {
+            task = task.split("/")[0]
+        }
         return task
     }
 
@@ -89,6 +92,16 @@ export class Message {
         }
 
         return message;
+    }
+
+    static composeTaskDueMessage(task: TaskModel): string {
+        const header = "Task due!"
+        const id = `Task ID: ${task.task_ID}\n`;
+        const description =  `📛Task: ${task.task_description}\n`;
+        const assignedTo = `👨🏻‍💻 Assigned to: ${task.assigned_to}\n`;
+        const dueBy = `📅 Due By: ${task.due_by}\n`;
+
+        return header + id + description + assignedTo + dueBy + "\n";
     }
 
     static composeErrorMessage(message: string): string {

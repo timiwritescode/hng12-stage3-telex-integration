@@ -25,7 +25,7 @@ curl -X POST "http://localhost:3000/format-message" \
          {"label": "repeatWords", "type": "multi-select", "default": "world, happy", "required": true},
          {"label": "noOfRepetitions", "type": "number", "default": 2, "required": true}
        ],
-       "message": "TODO: /d 2025-02-23 23:59"
+       "message": "TODO: do something anything /d 2025-02-22 10:06"
       }'
 
 
