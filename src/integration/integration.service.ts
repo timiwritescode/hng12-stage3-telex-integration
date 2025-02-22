@@ -43,7 +43,7 @@ export class IntegrationService {
                     setImmediate(async () => {
                 
                         const formattedMessage = await this.handleTaskOperation(message, channel_id);
-                        await this.sendBotMessageToChannel(errorMessage, channel_id)
+                        await this.sendBotMessageToChannel(errorMessage, channel_id, "error")
                     })
                     
                     const modifiedMessage = "<b><i>🎯 performed task operation: " + message;
@@ -60,7 +60,7 @@ export class IntegrationService {
                 return new ModifierIntegrationResponsePayload(
                     "message-formatted",
                     modifiedMessage,
-                    "success",
+                    "error",
                     "sender" 
                 )
              }
@@ -99,11 +99,11 @@ export class IntegrationService {
     }
 
 
-    private async sendBotMessageToChannel(formattedMessage: string, channelID: string, title = '🎯 Task') {
+    private async sendBotMessageToChannel(formattedMessage: string, channelID: string, status = 'successful', title = '🎯 Task') {
         const botMessagePayload = new ModifierIntegrationResponsePayload(
             title,
             formattedMessage,
-            "success",
+            status,
             "Task Bot"
         );
         await sendFormattedMessageToChannel(this.telexReturnUrl, channelID, botMessagePayload);

@@ -55,7 +55,7 @@ export class Message {
     }
 
     static composeTaskCreatedMessage(task: TaskModel): string {
-        const header = "🎯 <h1>New Task</h1> \n"
+        const header = "<h1><b>🎯 New Task</b></h1> \n"
         const id = `<b>Task ID:</b> ${task.task_ID}\n`;
         const description =  `<b>📋Task:</b> ${task.task_description}\n`;
         const assignedTo = `<b>👨🏻‍💻 Assigned to:</b> ${task.assigned_to}\n`;
