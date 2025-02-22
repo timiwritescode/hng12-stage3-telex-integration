@@ -175,7 +175,15 @@ export class IntegrationService {
     validateTODOMessage(message: string) {
         
         const messageUtil = new Message(message);
+        // validate task field
+        const task = messageUtil.getTaskFromMessage().trim();
+        if (task.length == 0 ||
+            task.startsWith('@') ||
+            task.startsWith('/d')
+        ) {
+            throw new BadRequestException('No task provided')
         
+        }
          
         // validate field date
         if (!message.includes('/d')) {
