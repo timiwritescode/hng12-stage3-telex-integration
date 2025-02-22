@@ -34,7 +34,12 @@ export class IntegrationService {
                 if (error.response) {
                     
                     const errorMessage = Message.composeErrorMessage(error.message)
-                    await this.sendBotMessageToChannel(errorMessage, channel_id)
+                    setImmediate(async () => {
+                
+                        const formattedMessage = await this.handleTaskOperation(message, channel_id);
+                        await this.sendBotMessageToChannel(errorMessage, channel_id)
+                    })
+                    
                     const modifiedMessage = "<b><i>🎯 performed task operation: " + message;
                     return new ModifierIntegrationResponsePayload(
                         "message-formated",
@@ -69,11 +74,10 @@ export class IntegrationService {
             
             
             // delegate task operation to bot
-            const channelID = payload.settings.filter(setting => setting.label == "channelID")[0].default;
             setImmediate(async () => {
                 
-                const formattedMessage = await this.handleTaskOperation(message, channelID);
-                await this.sendBotMessageToChannel(formattedMessage, channelID);
+                const formattedMessage = await this.handleTaskOperation(message, channel_id);
+                await this.sendBotMessageToChannel(formattedMessage, channel_id);
             })
             
             // return the original messge back to channel
