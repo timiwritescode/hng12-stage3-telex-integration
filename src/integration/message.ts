@@ -1,4 +1,11 @@
 import { TaskModel } from "src/db/task-model";
+import { formatDateTime } from "./util";
+import { BadRequestException } from "@nestjs/common";
+
+interface DateTimeField {
+    date: string;
+    time: Date
+}
 
 export class Message {
     private message: string;
@@ -26,10 +33,25 @@ export class Message {
 
     getDueDateFromMessage(): string {
         // get the date and time a task is to be completed
-        if (!this.message.includes("/d")) return "N/A";
         const dueDate = this.message.split("/d")[1]
         return dueDate;
     }
+
+    parseDateTimeField(): DateTimeField {
+        const dateField = this.getDueDateFromMessage().trim();
+        // get date in format yyyy-mm-dd
+        
+        const match = dateField.match(/^(\d{4}-\d{2}-\d{2})/);
+        const date = match ? match[1] : null;
+        // console.log(date)
+        const timeMatch = dateField.match(/\d{2}:\d{2}$/);
+        // console.log(timeMatch)
+        const time = timeMatch && date? new Date(`${date}T${timeMatch[0]}:00Z`) : null
+        // console.log(time)
+        return {date, time}
+
+    }
+
 
     static composeTaskDoneMessage(task: TaskModel) {
         const header = "✅️ Task Done \n"
@@ -45,8 +67,10 @@ export class Message {
         const id = `Task ID: ${task.task_ID}\n`;
         const description =  `◽Task: ${task.task_description}\n`;
         const assignedTo = `👨🏻‍💻 Assigned to: ${task.assigned_to}\n`;
-        const dueBy = `📅 Due By: ${task.due_by}\n`;
-
+        let dueBy = task.getTimeRemaining() ? 
+                        `📅 Due By: ${task.due_by} (${task.getTimeRemaining()}) \n` :
+                        `📅 Due By: ${formatDateTime(task.dateTime)} \n`;
+        
         return  id + description + assignedTo + dueBy + "\n";
     }
 

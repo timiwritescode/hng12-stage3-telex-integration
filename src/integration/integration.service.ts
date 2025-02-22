@@ -22,12 +22,28 @@ export class IntegrationService {
     async getMessageRequestPayload(payload: ModifierIntegrationRequestPayload): Promise<ModifierIntegrationResponsePayload> {
         const message = this.trimHTMLTagsfromMessage(payload.message)
         payload.channel_id = payload.settings.filter(setting => setting.label == "channelID")[0].default;
+        
         if (message.startsWith("TODO")) {
-            const formattedMessage = await this.formatMessage(message);
+            
              // save to db
              try {
+                this.validateTODOMessage(message)
                 await this.saveTaskToDB(payload);
+                
              } catch(error) {
+                if (error.response) {
+                    
+                    const message = Message.composeErrorMessage(error.message)
+                    await this.sendBotMessageToChannel(message, payload.channel_id)
+                    const modifiedMessage = "<b><i>🎯 performed task operation: " + message;
+                    return new ModifierIntegrationResponsePayload(
+                        "message-formated",
+                        modifiedMessage,
+                        "success",
+                        "Task Bot"
+                    )    
+                }
+
                 this.logger.error(error.message);
                 const modifiedMessage = "<b><i>❌ task bot internal error for operation: " + message + "</i></b>"
                 return new ModifierIntegrationResponsePayload(
@@ -38,7 +54,8 @@ export class IntegrationService {
                 )
              }
             
-        
+            
+            const formattedMessage = this.formatMessage(message);
             return new ModifierIntegrationResponsePayload(
                 "🎯 New task",
             formattedMessage,
@@ -56,13 +73,7 @@ export class IntegrationService {
             setImmediate(async () => {
                 
                 const formattedMessage = await this.handleTaskOperation(message, channelID);
-                const botMessagePayload = new ModifierIntegrationResponsePayload(
-                    "🎯 Task",
-                    formattedMessage,
-                    "success",
-                    "Task Bot"
-                )
-                await sendFormattedMessageToChannel(this.telexReturnUrl, channelID, botMessagePayload)
+                await this.sendBotMessageToChannel(formattedMessage, channelID);
             })
             
             // return the original messge back to channel
@@ -81,12 +92,20 @@ export class IntegrationService {
             "success",
             "Task Bot"
         )            
-            
-
     }
 
 
-    async formatMessage(incomingMessage: string): Promise<string> {    
+    private async sendBotMessageToChannel(formattedMessage: string, channelID: string) {
+        const botMessagePayload = new ModifierIntegrationResponsePayload(
+            "🎯 Task",
+            formattedMessage,
+            "success",
+            "Task Bot"
+        );
+        await sendFormattedMessageToChannel(this.telexReturnUrl, channelID, botMessagePayload);
+    }
+
+    formatMessage(incomingMessage: string): string {    
         this.logger.log("formatting started")
         const message = new Message(incomingMessage);
         const task = `◽ New Task: ${message.getTaskFromMessage()} \n`
@@ -153,21 +172,52 @@ export class IntegrationService {
 
     }
 
+    validateTODOMessage(message: string) {
+        
+        const messageUtil = new Message(message);
+        
+         
+        // validate field date
+        if (!message.includes('/d')) {
+            throw new BadRequestException('Date time field not set')
+        }
+
+        // validate field date
+        
+        const datefield = messageUtil.getDueDateFromMessage().trim();
+        const dateRegExp = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/;
+        if (!dateRegExp.test(datefield)) {
+            throw new BadRequestException('Date time should follow the format YYYY-MM-DD HH:MM')
+        }
+
+        // test time field that it doesn't exceed 23:59
+        const timeField = datefield.trim().split(' ')[1];
+        const timeRegExp = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
+        if (!timeRegExp.test(timeField)) {
+            throw new BadRequestException('Invalid time provided')
+        }
+
+        
+    }
     
 
 
     async saveTaskToDB(dto: ModifierIntegrationRequestPayload) {
         // save every incoming task into db
         try {
+            
             dto.message = this.trimHTMLTagsfromMessage(dto.message);
             const messageHelper = new Message(dto.message);
+            const {date, time} = messageHelper.parseDateTimeField();
 
             const newTask = new TaskModel();
             newTask.task_ID = "#" + (db.getCount() + 1);
             newTask.due = false;
             newTask.completed = false;
             newTask.assigned_to = messageHelper.getAssignedToFromMessage();
-            newTask.due_by = messageHelper.getDueDateFromMessage();
+            newTask.due_by = date;
+            newTask.dateTime = time;
+            newTask.createdAt = new Date();
             newTask.task_description = messageHelper.getTaskFromMessage();
             newTask.channel_id = dto.channel_id;
  
