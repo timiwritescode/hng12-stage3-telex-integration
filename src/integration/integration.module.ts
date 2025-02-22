@@ -5,7 +5,7 @@ import { TaskService } from './tasks.service';
 
 @Module({
     controllers: [IntegrationController],
-    providers: [IntegrationService, TaskService]
+    providers: [IntegrationService]
 
 })
 export class IntegrationModule {}

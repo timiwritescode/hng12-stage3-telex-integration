@@ -1,6 +1,7 @@
 import { Body, Controller, Get, HttpCode, Post, Req, Res } from '@nestjs/common';
 import { IntegrationService } from './integration.service';
 import { MODIFIER_JSON } from './modifier-json';
+import { ModifierIntegrationRequestPayload } from './dto/modifier-integration.dto';
 
 
 @Controller('')
@@ -8,10 +9,7 @@ export class IntegrationController {
 
     constructor(private integrationService: IntegrationService) {}
     @Get("integration.json")
-    getModifierJson(
-        @Req()
-        req
-    ) {
+    getModifierJson() {
         return MODIFIER_JSON;
         }
     
@@ -21,8 +19,9 @@ export class IntegrationController {
     @HttpCode(200)
     async formatMessage(
         @Body()
-        reqBody
+        reqBody: ModifierIntegrationRequestPayload
     ) {
+        // throw new Error("something bad happened")
         // messageQueue.push(reqBody)
         console.log(reqBody)
         const formattedMessage =  await this.integrationService.getMessageRequestPayload(reqBody);

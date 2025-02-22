@@ -15,7 +15,7 @@ export const MODIFIER_JSON = {
             updated_at: "2025-02-17"
         },
         descriptions: {
-                app_description: "A task message formatter that formats every message that starts with 'TODO' as a task message",
+                app_description: "Task Watch is a task management tool for handling tasks creation and assignment, tasks management and reminder, and setting deadlines for tasks in a team on a telex channel.",
                 app_logo: "https://i.ibb.co/ksRwWWL6/DALL-E-2025-02-21-17-38-38-A-modern-and-minimalist-logo-for-TASK-WATCH-The-logo-features-a-notepad-w.webp",
                 app_name: "Task Watch",
                 app_url: "https://hng12-stage3-telex-integration-production.up.railway.app",

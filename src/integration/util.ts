@@ -1,6 +1,6 @@
 import axios from "axios";
 import { ModifierIntegrationRequestPayload, ModifierIntegrationResponsePayload } from "./dto/modifier-integration.dto";
-import { TaskModel } from "src/db/task.model";
+import { TaskModel } from "src/db/task-model";
 
 export async function sendFormattedMessageToChannel(
                 telexReturnUrl: string, 

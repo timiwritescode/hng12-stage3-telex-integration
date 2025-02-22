@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { db, InMemoryDb } from "src/db/inMemorydb";
-import { TaskModel } from "src/db/task.model";
+import { TaskModel } from "src/db/task-model";
 import { TASK_DELETE, TASK_DONE } from "./constants/task-operatiors-expression";
 import { Message } from "./message";
 
-@Injectable()
+
 export class TaskService {
     async markTasksAsDone(taskID: string, channel_id: string): Promise<TaskModel> {
         try {

@@ -1,4 +1,4 @@
-import { TaskModel } from "./task.model";
+import { TaskModel } from "./task-model";
 
 export interface DbOperations {
     findAll(where: Partial<TaskModel>): Promise<TaskModel[]>

@@ -1,4 +1,4 @@
-import { TaskModel } from "src/db/task.model";
+import { TaskModel } from "src/db/task-model";
 
 export class Message {
     private message: string;

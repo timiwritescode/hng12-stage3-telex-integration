@@ -1,4 +1,5 @@
-import { IsNotEmpty } from "class-validator"
+import { Type } from "class-transformer"
+import { ArrayNotEmpty, IsArray, IsBoolean, IsNotEmpty, IsString, MinLength, ValidateNested } from "class-validator"
 
 export class ModifierIntegrationResponsePayload {
     event_name: string
@@ -24,6 +25,10 @@ export class ModifierIntegrationRequestPayload {
     channel_id: string;
 
     @IsNotEmpty()
+    @IsArray()
+    @ArrayNotEmpty()
+    @ValidateNested()
+    @Type(() => IntegrationSettings)
     settings: IntegrationSettings[];
 
     @IsNotEmpty()
@@ -33,10 +38,19 @@ export class ModifierIntegrationRequestPayload {
     
 }
 
-interface IntegrationSettings {
-    label: string,
-    type: string,
-    description: string,
-    default: string,
+class IntegrationSettings {
+    @IsNotEmpty()
+    @IsString()
+    label: string;
+
+    @IsNotEmpty()
+    @IsString()
+    type: string;
+
+    @IsNotEmpty()
+    default: string;
+
+    @IsNotEmpty()
+    @IsBoolean()
     required: boolean
 }
