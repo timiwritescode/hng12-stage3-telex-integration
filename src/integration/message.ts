@@ -95,7 +95,7 @@ export class Message {
     }
 
     static composeTaskDueMessage(task: TaskModel): string {
-        const header = "Task due!"
+        const header = "Task due!\n"
         const id = `Task ID: ${task.task_ID}\n`;
         const description =  `📛Task: ${task.task_description}\n`;
         const assignedTo = `👨🏻‍💻 Assigned to: ${task.assigned_to}\n`;

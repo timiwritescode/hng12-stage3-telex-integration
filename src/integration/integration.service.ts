@@ -244,15 +244,23 @@ export class IntegrationService {
         const now = new Date();
         const delay = task.dateTime.getTime() - now.getTime();
 
-        setTimeout(async () => {
-            console.log("Executing task due reminder")
-            const title = "⏰ Task Due 🔴"
-            const message = Message.composeTaskDueMessage(task)
-            await this.sendBotMessageToChannel(
-                message,
-                task.channel_id,
-                title
-            )
-        }, delay)
+        const maxDelay = 2_147_483_000;
+    
+        if (delay > maxDelay) {
+            console.log((`Delay is too log, setting for max delay and retrying execution after then`))
+            setTimeout(() => this.scheduleTaskDueReminder(task), maxDelay)
+        } else {
+            setTimeout(async () => {
+                console.log("Executing task due reminder")
+                const title = "⏰ Task Due 🔴"
+                const message = Message.composeTaskDueMessage(task)
+                await this.sendBotMessageToChannel(
+                    message,
+                    task.channel_id,
+                    title
+                )
+            }, delay)
+        }
+        
     }
 }
